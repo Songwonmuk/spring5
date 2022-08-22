@@ -1,0 +1,64 @@
+--spring5 테이블 구조
+
+drop table spring5_member;
+drop table spring5_board;
+drop table spring5_reply;
+drop sequence spring5_board_seq;
+drop sequence spring5_reply_seq;
+
+--회원정보
+create table spring5_member (
+	memberid		varchar2(20) primary key,   --사용자 식별ID
+	memberpw		varchar2(100) not null,     --비밀번호
+	membername		varchar2(30) not null,      --사용자 이름
+	email			varchar2(50),               --이메일주소
+	phone			varchar2(50),	            --전화번호
+	address			varchar2(200),      	    --집주소
+	enabled			number(1) default 1 check (enabled in (0, 1)), --계정상태. 1:사용가능, 0:사용불가능
+	rolename		varchar2(20) default 'ROLE_USER' check (rolename in ('ROLE_USER', 'ROLE_ADMIN')) --사용자 구분. 'ROLE_USER', 'ROLE_ADMIN'중 하나
+);
+
+--게시판 글
+create table spring5_board (
+	boardnum		number primary key,			--글번호
+	memberid		varchar2(20) references spring5_member(memberid), 	--작성자ID
+	title			varchar2(300) not null,		--제목
+	contents		varchar2(3000) not null, 	--내용
+	inputdate		date default sysdate, 		--작성일,
+	hits			number default 0,			--조회수
+	originalfile	varchar2(200),				--첨부파일 원래이름
+	savedfile		varchar2(100)				--첨부파일 서버에 저장된 이름
+);
+
+--게시판 글번호에 사용할 시퀀스
+create sequence spring5_board_seq;
+
+--게시글의 댓글
+create table spring5_reply (
+	replynum		number	primary key,		--댓글번호
+	boardnum		number references spring5_board(boardnum) on delete cascade,	--본문 글번호
+	memberid		varchar2(20) references spring5_member(memberid),	--작성자 ID
+	replytext		varchar2(200) not null,		--내용
+	inputdate		date 	default sysdate		--작성일
+);
+
+--댓글 번호에 사용할 시퀀스
+create sequence spring5_reply_seq;
+
+
+--저장 예
+
+insert into spring5_member values ('aaa', '111', '홍길동', 'aaa@aaa.com', '010-1111-1111', '서울시 삼성동', 1, 'ROLE_USER');
+insert into spring5_member (memberid, memberpw, membername) values ('bbb', '222', '김철수');
+insert into spring5_member (memberid, memberpw, membername, email, phone, address) values ('ccc', '333', '이영희', 'ccc@ccc.com', '010-1234-5678', '서울시 서초동');
+
+insert into spring5_board (boardnum, memberid, title, contents) values (spring5_board_seq.nextval, 'aaa', '제목', '내용'); 
+insert into spring5_reply (replynum, boardnum, memberid, replytext) values (spring5_reply_seq.nextval, 1, 'aaa', '댓글내용');
+
+commit;
+
+--확인
+select * from spring5_member;
+select * from spring5_board;
+select * from spring5_reply;
+

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org" 
+     xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+<meta charset="UTF-8">
+<title>spring5</title>
+<link rel="stylesheet" type="text/css" th:href="@{/css/main.css}" />
+<script>
+//글 삭제
+function deleteBoard(num) {
+	if (confirm('삭제하시겠습니까?')) {
+		location.href = 'delete?boardnum=' + num;
+	}
+}
+//리플 작성
+function validation() {
+	let replytext = document.getElementById('replytext');
+	if (replytext.value.length < 5) {
+		alert('리플 내용을 5자 이상으로 입력하세요.');
+		return false;
+	}
+	return true;
+}
+
+//리플 삭제
+function deleteReply(replynum, boardnum) {
+	if (confirm('삭제하시겠습니까?')) {
+		location.href = 'deleteReply?replynum=' + replynum + '&boardnum=' + boardnum;
+	}
+}
+</script>
+</head>
+<body>
+<header>
+	<h1>[ 게시글 읽기 ]</h1>
+</header>
+<section>
+	<table>
+	<tr>
+		<th style="width: 100px;">작성자</th>
+		<td th:text="${board.memberid}" style="width: 600px;"></td>
+	</tr>
+	<tr>
+		<th>작성일</th>
+		<td th:text="${board.inputdate}"></td>
+	</tr>
+	<tr>
+		<th>조회수</th>
+		<td th:text="${board.hits}"></td>
+	</tr>
+	<tr>
+		<th>제목</th>
+		<td th:text="${board.title}"></td>
+	</tr>
+	<tr>
+		<th>내용</th>
+		<td><pre th:text="${board.contents}"></pre></td>
+	</tr>
+	<tr>
+		<th>파일첨부</th>
+		<td><a th:href="@{/board/download(boardnum=${board.boardnum})}" th:text="${board.originalfile}"></a></td>
+	</tr>
+</table>
+<br>
+
+<div th:if="${#authentication.name} == ${board.memberid}">
+	<a th:href="@{/board/update(boardnum=${board.boardnum})}">수정</a>
+	<a th:href="|javascript:deleteBoard(${board.boardnum})|">삭제</a>
+</div>
+<br>
+
+<!-- 리플 작성 폼 시작 -->
+<form th:action="@{/board/writeReply}" method="post" onsubmit="return validation();">
+리플내용
+	<input type="hidden" name="boardnum" th:value="${board.boardnum}">
+	<input type="text" name="replytext" id="replytext" style="width:500px;">
+	<input type="submit" value="확인">
+</form>
+
+<!-- 리플 목록 출력 시작 -->
+<table class="reply">
+	<tr th:each="reply : ${replylist}">
+		<td class="replyid" th:text="${reply.memberid}"></td>
+		<td class="replytext" th:text="${reply.replytext}"></td>
+		<td class="replydate" th:text="${reply.inputdate}"></td>
+		<td class="white">
+			<span th:if="${#authentication.name} == ${reply.memberid}">
+				<a th:href="|javascript:deleteReply(${reply.replynum}, ${reply.boardnum})|">
+					<img th:src="@{/image/icon_delete_24.png}">
+				</a>
+			</span>
+		</td>
+	</tr>	
+</table>
+
+</section>
+</body>
+</html>

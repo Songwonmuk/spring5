@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>회원가입</title>
+<link rel="stylesheet" type="text/css" th:href="@{/css/main.css}">
+<script>
+//가입폼 확인
+function validation() {
+	let memberpw = document.getElementById('memberpw');
+	let memberpw2 = document.getElementById('memberpw2');
+	let membername = document.getElementById('membername');
+	
+	if (memberpw.value != '' && (memberpw.value.length < 3 || memberpw.value.length > 10)) {
+		alert("비밀번호는 3~10자로 입력하세요.");
+		return false;
+	}
+	if (memberpw.value != memberpw2.value) {
+		alert("비밀번호를 정확하게 입력하세요.");
+		return false;
+	}
+	if (membername.value == '') {
+		alert("이름을 입력하세요.");
+		return false;
+	}
+	return true;
+}
+
+</script>
+</head>
+<body>
+	<header>
+	<h1>[ 개인정보 수정 ]</h1>
+	</header>
+	<section>
+	<form id="mypageForm" th:action="@{/member/mypage}"  method="post" onsubmit="return validation();">
+	<table>
+		<tr>
+			<th>ID</th>
+			<td th:text="${member.memberid}"></td>
+		</tr>
+		<tr>
+			<th>비밀번호</th>
+			<td><input type="password" name="memberpw" id="memberpw" placeholder="비밀번호를 변경하려면 입력하세요."><br>
+			<input type="password" id="memberpw2" placeholder="비밀번호 다시 입력"></td>
+		</tr>
+		<tr>
+			<th>이름</th>
+			<td><input type="text" name="membername" id="membername" th:value="${member.membername}" placeholder="이름 입력"></td>
+		</tr>
+		<tr>
+			<th>이메일</th>
+			<td><input type="text" name="email" id="email" th:value="${member.email}" placeholder="이메일 입력"></td>
+		</tr>
+		<tr>
+			<th>전화번호</th>
+			<td><input type="text" name="phone" th:value="${member.phone}" placeholder="전화번호 입력"></td>
+		</tr>
+		<tr>
+			<th>주소</th>
+			<td><input type="text" name="address" th:value="${member.address}" placeholder="주소 입력" style="width:300px;"></td>
+		</tr>
+	</table>
+	<br>
+	
+	<input type="submit" value="수정" />
+	<input type="reset" value="다시 쓰기" />
+	
+	</form>	
+	</section>
+	
+</body>
+</html>

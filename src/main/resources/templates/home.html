@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+<meta charset="UTF-8">
+<title>spring5</title>
+</head>
+<body>
+	<h1>[ spring5 ]</h1>
+	<ul>
+		<li sec:authorize="not isAuthenticated()"><a th:href="@{/member/join}">회원가입</a></li>
+		<li sec:authorize="not isAuthenticated()"><a th:href="@{/member/loginForm}">로그인</a></li>
+		<li sec:authorize="isAuthenticated()"><a th:href="@{/logout}">로그아웃</a></li>
+		<li sec:authorize="isAuthenticated()"><a th:href="@{/member/mypage}">개인정보 수정</a></li>
+		<li><a th:href="@{/board/list}">게시판</a></li>
+		
+		<li><a th:href="@{/thymeleaf}">Thymeleaf (Security관련)</a></li>
+	</ul>
+	
+<pre>
+	Spring & Mybatis를 이용한 CRUD, Thumeleaf, Security, Lombok, Log 
+</pre>
+</body>
+</html>

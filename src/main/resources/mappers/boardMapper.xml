@@ -1,0 +1,187 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.softsociety.spring5.dao.BoardDAO">
+
+<!-- 게시글 저장 -->
+<insert id="insertBoard" parameterType="Board">
+	insert 
+	into 
+		spring5_board (
+			boardnum
+			, memberid
+			, title
+			, contents
+			<if test="originalfile != null and savedfile != null">
+			, originalfile
+			, savedfile
+			</if>
+		)
+	values (
+			spring5_board_seq.nextval
+			, #{memberid}
+			, #{title}
+			, #{contents}
+			<if test="originalfile != null and savedfile != null">
+			, #{originalfile}
+			, #{savedfile}
+			</if>
+		)
+</insert>
+
+<!-- 게시글 읽기 -->
+<select id="selectBoard" parameterType="int" resultType="Board">
+	select 
+		boardnum
+		, memberid
+		, title
+		, contents
+		, to_char(inputdate, 'YYYY-MM-DD HH24:MI:SS') inputdate
+		, hits
+		, originalfile
+		, savedfile
+	from 
+		spring5_board
+	where 
+		boardnum = #{boardnum}
+</select>
+
+<!-- 조회수 1 증가 -->
+<update id="updateHits" parameterType="int">
+	update
+		spring5_board
+	set
+		hits = hits + 1
+	where
+		boardnum = #{boardnum}
+</update>
+
+<!-- 전체 글 개수 (검색 필터링 후) -->
+<select id="countBoard" parameterType="map" resultType="int">
+	select 
+		count(*)
+	from 
+		spring5_board 
+	<if test="type != null and searchWord != null">
+	<where>
+		<if test="type == 'title'">
+			title like '%' || #{searchWord} || '%'
+		</if>	
+		<if test="type == 'contents'">
+			contents like '%' || #{searchWord} || '%'
+		</if>	
+		<if test="type == 'memberid'">
+			memberid like '%' || #{searchWord} || '%'
+		</if>	
+		<if test="type == 'all'">
+			title like '%' || #{searchWord} || '%'
+			or contents like '%' || #{searchWord} || '%'
+			or memberid like '%' || #{searchWord} || '%'
+		</if>	
+	</where> 
+	</if>
+</select>
+
+<!-- 현재 페이지 목록 (검색 필터링 후) -->
+<select id="selectBoardList" parameterType="map" resultType="Board">
+	select 
+		boardnum
+		, memberid
+		, title
+		, to_char(inputdate, 'YYYY-MM-DD') inputdate
+		, hits
+	from 
+		spring5_board 
+	<if test="type != null and searchWord != null">
+	<where>
+		<if test="type == 'title'">
+			title like '%' || #{searchWord} || '%'
+		</if>	
+		<if test="type == 'contents'">
+			contents like '%' || #{searchWord} || '%'
+		</if>	
+		<if test="type == 'memberid'">
+			memberid like '%' || #{searchWord} || '%'
+		</if>	
+		<if test="type == 'all'">
+			title like '%' || #{searchWord} || '%'
+			or contents like '%' || #{searchWord} || '%'
+			or memberid like '%' || #{searchWord} || '%'
+		</if>	
+	</where> 
+	</if>
+	order by boardnum desc
+</select>
+
+<!-- 글 삭제 -->
+<delete id="deleteBoard" parameterType="Board">
+	delete
+	from
+		spring5_board
+	where
+		boardnum = #{boardnum}
+		and memberid = #{memberid}
+</delete>
+
+<!-- 글 수정 -->
+<update id="updateBoard" parameterType="Board">
+	update
+		spring5_board
+	set
+		title = #{title}
+		, contents = #{contents}
+		<if test="originalfile != null and savedfile != null">
+		, originalfile = #{originalfile}
+		, savedfile = #{savedfile}
+		</if>
+	where
+		boardnum = #{boardnum}
+		and memberid = #{memberid}
+</update>
+
+<!-- 리플 저장 -->
+<insert id="insertReply" parameterType="Reply">
+	insert 
+	into 
+		spring5_reply (
+			replynum
+			, boardnum
+			, memberid
+			, replytext
+		)
+	values (
+			spring5_reply_seq.nextval
+			, #{boardnum}
+			, #{memberid}
+			, #{replytext}
+	)
+</insert>
+
+<!-- 리플 목록 -->
+<select id="selectReplyList" parameterType="int" resultType="Reply">
+	select
+		replynum
+		, boardnum
+		, memberid
+		, replytext
+		, to_char(inputdate, 'yy.mm.dd') inputdate
+	from
+		spring5_reply
+	where
+		boardnum = #{boardnum}
+	order by
+		replynum
+</select>
+
+<!-- 리플 삭제 -->
+<delete id="deleteReply" parameterType="Reply">
+	delete 
+	from 
+		spring5_reply 
+	where 
+		replynum = #{replynum} 
+		and memberid = #{memberid}
+</delete>
+
+</mapper>
